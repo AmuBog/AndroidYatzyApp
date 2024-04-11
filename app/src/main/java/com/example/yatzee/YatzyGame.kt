@@ -1,7 +1,5 @@
 package com.example.yatzee
 
-import com.example.yatzee.models.YatzeeScoreType
-
 object YatzyGame {
     private var playerTurnIndex = 0
     var turn = 1
@@ -15,16 +13,14 @@ object YatzyGame {
                 players[playerTurnIndex]
             }
         } else ""
-    val scores = mutableMapOf<String, MutableMap<YatzeeScoreType, String>>()
 
     fun resetGame() {
         playerTurnIndex = 0
         turn = 1
         players.clear()
-        scores.clear()
     }
 
-    fun registerScore(type: YatzeeScoreType, score: Int) {
+/*    fun registerScore(type: YatzeeScoreType, score: Int) {
         val scoreBoard = scores[playerTurn]
         if (score == 0) {
             scoreBoard?.put(type, "-")
@@ -71,10 +67,10 @@ object YatzyGame {
         }
 
         nextPlayer()
-    }
+    }*/
 
-    private fun nextPlayer() {
-        if (playerTurnIndex + 1 >= scores.size) {
+    fun nextPlayer() {
+        if (playerTurnIndex + 1 >= players.size) {
             turn++
             playerTurnIndex = 0
         } else {
