@@ -1,0 +1,12 @@
+package com.example.yatzee.models
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
+data class Score(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val playerName: String,
+    val type: YatzeeScoreType,
+    val value: Int
+)
