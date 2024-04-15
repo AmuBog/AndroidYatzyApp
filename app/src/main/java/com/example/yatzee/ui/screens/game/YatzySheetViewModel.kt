@@ -1,7 +1,6 @@
 package com.example.yatzee.ui.screens.game
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -42,30 +41,60 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            db.scoreDao().getPlayerScore(YatzyGame.playerTurn).collect { s ->
-                Log.d("TEST", "Number: ${s.first().value}")
+            db.scoreDao().getPlayerScores().collect { playerScores ->
+                val scoreBoard = playerScores.map { it.playerName }.associateWith { player ->
+                    playerScores.filter { it.playerName == player }
+                        .associate { it.type to it.value }
+                }
+                val highScore =
+                    playerScores.filter { it.type == YatzeeScoreType.Sum }.maxByOrNull { it.value }
+                val winner = highScore?.playerName
+
+                _uiState.update {
+                    it.copy(
+                        scores = scoreBoard,
+                        highscore = highScore?.value ?: 0,
+                        winner = winner ?: "Unknown"
+                    )
+                }
             }
         }
     }
 
     fun registerScore(type: YatzeeScoreType, score: Int?) {
         val player = YatzyGame.playerTurn
+        val scoreBoard = uiState.value.scores.map { it.key to it.value.toMutableMap() }.toMap().toMutableMap()
+        var upperSum = 0
+        var totalSum = 0
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val element = db.scoreDao().getSpecificScore(player, type)
-                db.scoreDao().addPlayerScore(
-                    Score(
-                        id = element.id,
-                        playerName = player,
-                        type = type,
-                        value = score ?: 0
-                    )
-                )
+        addScore(player, type, score ?: 0)
+        scoreBoard[player]!![type] = score ?: 0
+
+        // Find new upper sum
+        scoreBoard[player]?.map { it.value }?.let { values ->
+            for (i in 0..5) {
+                upperSum += values[i]
             }
         }
 
-        YatzyGame.registerScore(type, score ?: 0)
+        // Check if player got bonus!
+        val bonus: Int = if (upperSum >= 63) 50 else 0
+
+        // Find new total sum
+        scoreBoard[player]?.let { scoreMap ->
+            val values = scoreMap.map { it.value }
+            totalSum = upperSum
+
+            for (i in 7..16) {
+                totalSum += values[i]
+            }
+        }
+
+        addScore(player, YatzeeScoreType.UpperSum, upperSum)
+        addScore(player, YatzeeScoreType.Bonus, bonus)
+        addScore(player, YatzeeScoreType.Sum, totalSum)
+
+        YatzyGame.nextPlayer()
         _uiState.update {
             it.copy(
                 numberOfThrows = 3,
@@ -123,9 +152,25 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
         _uiState.update {
             it.copy(
                 possibleOutcomes = possibleOutcomes.filter { scores ->
-                    scores.key in YatzyGame.scores[_uiState.value.playerTurn]!!.filter { score -> score.value == "0" }.keys
+                    scores.key in uiState.value.scores[_uiState.value.playerTurn]!!.filter { score -> score.value == 0 }.keys
                 }
             )
+        }
+    }
+
+    private fun addScore(player: String, type: YatzeeScoreType, score: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val element = db.scoreDao().getSpecificScore(player, type)
+                db.scoreDao().addPlayerScore(
+                    Score(
+                        id = element.id,
+                        playerName = player,
+                        type = type,
+                        value = score
+                    )
+                )
+            }
         }
     }
 

@@ -103,7 +103,6 @@ class MenuViewModel(val db: YatzyDatabase) : ViewModel() {
         YatzyGame.players.addAll(uiState.value.players)
         YatzyGame.players.forEach { player ->
             val playerScoreCard = mutableListOf<Score>()
-            YatzyGame.scores[player] = mutableMapOf<YatzeeScoreType, String>().initializeScores()
             YatzeeScoreType.entries.forEach { type ->
                 playerScoreCard.add(
                     Score(playerName = player, type = type, value = 0)

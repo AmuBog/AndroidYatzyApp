@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.yatzee.R
 import com.example.yatzee.YatzyGame
-import com.example.yatzee.initializeScores
 import com.example.yatzee.models.YatzeeScoreType
 import com.example.yatzee.ui.common.Dice
 import com.example.yatzee.ui.common.PrimaryButton
@@ -77,9 +76,7 @@ fun YatzeeSheetScreen(
                     // One blank to push the list down
                     Text(modifier = Modifier.padding(8.dp), text = "")
                     YatzeeScoreType.entries.forEach { type ->
-                        if ((YatzyGame.scores[uiState.playerTurn]?.get(type)
-                                ?: "0") == "0" && uiState.possibleOutcomes.any { it.key == type } ||
-                            (uiState.numberOfThrows == 0 && uiState.possibleOutcomes.isEmpty() && YatzyGame.scores[uiState.playerTurn]!![type] == "0")
+                        if ((uiState.scores[uiState.playerTurn]?.get(type) ?: 0) == 0 && uiState.possibleOutcomes.any { it.key == type } || (uiState.numberOfThrows == 0 && uiState.possibleOutcomes.isEmpty() && uiState.scores[uiState.playerTurn]!![type] == 0)
                         ) {
                             Text(
                                 modifier = Modifier
@@ -106,7 +103,7 @@ fun YatzeeSheetScreen(
                 }
                 // Score card
                 Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    YatzyGame.scores.forEach { scores ->
+                    uiState.scores.forEach { scores ->
                         val modifier =
                             if (uiState.playerTurn == scores.key && uiState.turn < 16) Modifier.border(
                                 BorderStroke(
@@ -149,15 +146,15 @@ fun YatzeeSheetScreen(
                                             .align(Alignment.Center)
                                             .padding(4.dp),
                                         text = if (isPlayersTurn) {
-                                            if (score.value == "0") {
+                                            if (score.value == 0) {
                                                 (uiState.possibleOutcomes[score.key]
                                                     ?: 0).toString()
-                                            } else score.value
+                                            } else score.value.toString()
                                         } else {
-                                            score.value
+                                            score.value.toString()
                                         },
-                                        fontWeight = if (isPlayersTurn && score.value == "0" && uiState.possibleOutcomes[score.key] != null) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isPlayersTurn && score.value == "0" && uiState.possibleOutcomes[score.key] != null) MaterialTheme.colorScheme.primary else Color.Black,
+                                        fontWeight = if (isPlayersTurn && score.value == 0 && uiState.possibleOutcomes[score.key] != null) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isPlayersTurn && score.value == 0 && uiState.possibleOutcomes[score.key] != null) MaterialTheme.colorScheme.primary else Color.Black,
                                     )
                                 }
                             }
@@ -191,20 +188,9 @@ fun YatzeeSheetScreen(
                     enabled = uiState.numberOfThrows > 0
                 )
             } else {
-                var highscore = 0
-                var winner = ""
-
-                YatzyGame.scores.forEach { (player, scoreCard) ->
-                    val score = (scoreCard[YatzeeScoreType.Sum] ?: "0").toInt()
-                    if (score > highscore) {
-                        highscore = score
-                        winner = player
-                    }
-                }
-
                 Column(Modifier.padding(16.dp)) {
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(text = "Congratulation $winner! You win with a score of $highscore !")
+                    Text(text = "Congratulation ${uiState.winner}! You win with a score of ${uiState.highscore} !")
                     Spacer(Modifier.height(16.dp))
                     PrimaryButton(
                         modifier = Modifier.fillMaxWidth(),
@@ -224,12 +210,6 @@ fun YatzeeSheetScreen(
 @Preview(showBackground = true)
 @Composable
 private fun YatzeeSheetPreview() {
-    YatzyGame.players.clear()
-    YatzyGame.players.addAll(listOf("Steve", "Martin", "Ron", "Joy"))
-    YatzyGame.players.forEach { player ->
-        YatzyGame.scores[player] = mutableMapOf<YatzeeScoreType, String>().initializeScores()
-    }
-
     YatzeeTheme {
         YatzeeSheetScreen(
             backNavigation = {}

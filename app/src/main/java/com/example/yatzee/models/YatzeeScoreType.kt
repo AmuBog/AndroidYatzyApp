@@ -18,5 +18,12 @@ enum class YatzeeScoreType(val value: String = "") {
     FullHouse("Full house"),
     Chance,
     Yatzy,
-    Sum
+    Sum;
+
+    fun isUpperHalf(): Boolean {
+        return when(this) {
+            Ones, Twos, Threes, Fours, Fives, Sixes -> true
+            else -> false
+        }
+    }
 }
