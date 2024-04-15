@@ -1,22 +1,22 @@
 package com.example.yatzee
 
 import com.example.yatzee.models.Dice
-import com.example.yatzee.models.YatzeeScoreType
-import com.example.yatzee.models.YatzeeScoreType.Chance
-import com.example.yatzee.models.YatzeeScoreType.Fives
-import com.example.yatzee.models.YatzeeScoreType.FourOfAKind
-import com.example.yatzee.models.YatzeeScoreType.Fours
-import com.example.yatzee.models.YatzeeScoreType.FullHouse
-import com.example.yatzee.models.YatzeeScoreType.LargeStraight
-import com.example.yatzee.models.YatzeeScoreType.OnePair
-import com.example.yatzee.models.YatzeeScoreType.Ones
-import com.example.yatzee.models.YatzeeScoreType.Sixes
-import com.example.yatzee.models.YatzeeScoreType.SmallStraight
-import com.example.yatzee.models.YatzeeScoreType.ThreeOfAKind
-import com.example.yatzee.models.YatzeeScoreType.Threes
-import com.example.yatzee.models.YatzeeScoreType.TwoPairs
-import com.example.yatzee.models.YatzeeScoreType.Twos
-import com.example.yatzee.models.YatzeeScoreType.Yatzy
+import com.example.yatzee.models.YatzyScoreType
+import com.example.yatzee.models.YatzyScoreType.Chance
+import com.example.yatzee.models.YatzyScoreType.Fives
+import com.example.yatzee.models.YatzyScoreType.FourOfAKind
+import com.example.yatzee.models.YatzyScoreType.Fours
+import com.example.yatzee.models.YatzyScoreType.FullHouse
+import com.example.yatzee.models.YatzyScoreType.LargeStraight
+import com.example.yatzee.models.YatzyScoreType.OnePair
+import com.example.yatzee.models.YatzyScoreType.Ones
+import com.example.yatzee.models.YatzyScoreType.Sixes
+import com.example.yatzee.models.YatzyScoreType.SmallStraight
+import com.example.yatzee.models.YatzyScoreType.ThreeOfAKind
+import com.example.yatzee.models.YatzyScoreType.Threes
+import com.example.yatzee.models.YatzyScoreType.TwoPairs
+import com.example.yatzee.models.YatzyScoreType.Twos
+import com.example.yatzee.models.YatzyScoreType.Yatzy
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -79,8 +79,8 @@ private fun getHouse(dices: List<Dice>): Int {
     return if (count.size == 2 && count.values.any { it == 3 }) dices.sumOf { it.value } else 0
 }
 
-fun MutableMap<YatzeeScoreType, String>.initializeScores(): MutableMap<YatzeeScoreType, String> {
-    YatzeeScoreType.entries.forEach {
+fun MutableMap<YatzyScoreType, String>.initializeScores(): MutableMap<YatzyScoreType, String> {
+    YatzyScoreType.entries.forEach {
         set(it, "0")
     }
     return this

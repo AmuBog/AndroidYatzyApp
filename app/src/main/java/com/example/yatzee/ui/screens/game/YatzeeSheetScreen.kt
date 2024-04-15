@@ -38,8 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.yatzee.R
-import com.example.yatzee.YatzyGame
-import com.example.yatzee.models.YatzeeScoreType
 import com.example.yatzee.ui.common.Dice
 import com.example.yatzee.ui.common.PrimaryButton
 import com.example.yatzee.ui.theme.YatzeeTheme
@@ -75,9 +73,8 @@ fun YatzeeSheetScreen(
                 Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                     // One blank to push the list down
                     Text(modifier = Modifier.padding(8.dp), text = "")
-                    YatzeeScoreType.entries.forEach { type ->
-                        if ((uiState.scores[uiState.playerTurn]?.get(type) ?: 0) == 0 && uiState.possibleOutcomes.any { it.key == type } || (uiState.numberOfThrows == 0 && uiState.possibleOutcomes.isEmpty() && uiState.scores[uiState.playerTurn]!![type] == 0)
-                        ) {
+                    uiState.scores[uiState.playerTurn]?.forEach { score ->
+                        if (uiState.possibleOutcomes[score.type] != null && !score.isStroke) {
                             Text(
                                 modifier = Modifier
                                     .background(
@@ -86,17 +83,33 @@ fun YatzeeSheetScreen(
                                     )
                                     .padding(4.dp)
                                     .clickable {
-                                        viewModel.registerScore(
-                                            type,
-                                            uiState.possibleOutcomes[type]
+                                        viewModel.completeTurn(
+                                            score.type,
+                                            uiState.possibleOutcomes[score.type]
                                         )
                                     },
-                                text = type.name
+                                text = score.type.name
+                            )
+                        } else if (uiState.numberOfThrows == 0 && uiState.possibleStrokes[score.type] != null) {
+                            Text(
+                                modifier = Modifier
+                                    .background(
+                                        Color.Red,
+                                        RoundedCornerShape(4.dp)
+                                    )
+                                    .padding(4.dp)
+                                    .clickable {
+                                        viewModel.completeTurn(
+                                            score.type,
+                                            null
+                                        )
+                                    },
+                                text = score.type.name
                             )
                         } else {
                             Text(
                                 modifier = Modifier.padding(4.dp),
-                                text = type.value.ifEmpty { type.name }
+                                text = score.type.value.ifEmpty { score.type.name }
                             )
                         }
                     }
@@ -146,15 +159,15 @@ fun YatzeeSheetScreen(
                                             .align(Alignment.Center)
                                             .padding(4.dp),
                                         text = if (isPlayersTurn) {
-                                            if (score.value == 0) {
-                                                (uiState.possibleOutcomes[score.key]
+                                            if (score.value == 0 && !score.isStroke) {
+                                                (uiState.possibleOutcomes[score.type]
                                                     ?: 0).toString()
-                                            } else score.value.toString()
+                                            } else if (score.isStroke) "-" else score.value.toString()
                                         } else {
-                                            score.value.toString()
+                                            if (score.isStroke) "-" else score.value.toString()
                                         },
-                                        fontWeight = if (isPlayersTurn && score.value == 0 && uiState.possibleOutcomes[score.key] != null) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isPlayersTurn && score.value == 0 && uiState.possibleOutcomes[score.key] != null) MaterialTheme.colorScheme.primary else Color.Black,
+                                        fontWeight = if (isPlayersTurn && uiState.possibleOutcomes[score.type] != null) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isPlayersTurn && uiState.possibleOutcomes[score.type] != null) MaterialTheme.colorScheme.primary else Color.Black,
                                     )
                                 }
                             }

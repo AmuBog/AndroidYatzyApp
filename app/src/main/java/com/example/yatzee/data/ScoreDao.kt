@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.example.yatzee.models.Score
-import com.example.yatzee.models.YatzeeScoreType
+import com.example.yatzee.models.YatzyScoreType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,7 +20,7 @@ interface ScoreDao {
     fun getPlayerScores(): Flow<List<Score>>
 
     @Query("SELECT * FROM Score WHERE playerName = :playerName AND type = :type")
-    fun getSpecificScore(playerName: String, type: YatzeeScoreType) : Score
+    fun getSpecificScore(playerName: String, type: YatzyScoreType) : Score
 
     @Query("DELETE FROM Score")
     fun deleteAllScores()

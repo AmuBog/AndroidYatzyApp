@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.yatzee.models.Score
 
-@Database(entities = [Score::class], version = 1)
+@Database(entities = [Score::class], version = 2)
 abstract class YatzyDatabase : RoomDatabase() {
     abstract fun scoreDao(): ScoreDao
 
@@ -30,7 +30,9 @@ abstract class YatzyDatabase : RoomDatabase() {
                         context.applicationContext,
                         YatzyDatabase::class.java,
                         Database_NAME
-                    ).build()
+                    )
+                        .fallbackToDestructiveMigration()
+                        .build()
 
                     INSTANCE = instance
                 }

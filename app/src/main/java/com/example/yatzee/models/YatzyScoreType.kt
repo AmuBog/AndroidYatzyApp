@@ -1,6 +1,6 @@
 package com.example.yatzee.models
 
-enum class YatzeeScoreType(val value: String = "") {
+enum class YatzyScoreType(val value: String = "") {
     Ones,
     Twos,
     Threes,

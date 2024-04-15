@@ -8,10 +8,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yatzee.YatzyGame
 import com.example.yatzee.data.YatzyDatabase
-import com.example.yatzee.initializeScores
 import com.example.yatzee.models.Score
-import com.example.yatzee.models.YatzeeScoreType
-import com.example.yatzee.ui.screens.game.YatzySheetViewModel
+import com.example.yatzee.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -103,7 +101,7 @@ class MenuViewModel(val db: YatzyDatabase) : ViewModel() {
         YatzyGame.players.addAll(uiState.value.players)
         YatzyGame.players.forEach { player ->
             val playerScoreCard = mutableListOf<Score>()
-            YatzeeScoreType.entries.forEach { type ->
+            YatzyScoreType.entries.forEach { type ->
                 playerScoreCard.add(
                     Score(playerName = player, type = type, value = 0)
                 )
