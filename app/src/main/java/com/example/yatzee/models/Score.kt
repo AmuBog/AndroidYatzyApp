@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Score(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val playerName: String,
-    val type: YatzeeScoreType,
-    val value: Int
+    val type: YatzyScoreType,
+    val value: Int,
+    val isStroke: Boolean = false
 )
