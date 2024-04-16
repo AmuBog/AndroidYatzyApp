@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Clear DB whenever we launch the app for now..
         GlobalScope.launch {
             (application as YatzyApplication).container.scoresRepository.clearScores()
         }
