@@ -1,4 +1,4 @@
-package com.example.yatzee.data
+package com.example.yatzee.data.database
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -18,6 +18,9 @@ interface ScoreDao {
 
     @Query("SELECT * FROM Score")
     fun getPlayerScores(): Flow<List<Score>>
+
+    @Query("SELECT * FROM Score WHERE playerName = :playerName")
+    fun getPlayerScores(playerName: String): List<Score>
 
     @Query("SELECT * FROM Score WHERE playerName = :playerName AND type = :type")
     fun getSpecificScore(playerName: String, type: YatzyScoreType) : Score

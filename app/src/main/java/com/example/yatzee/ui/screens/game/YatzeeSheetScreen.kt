@@ -31,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +45,7 @@ import com.example.yatzee.ui.theme.YatzeeTheme
 @Composable
 fun YatzeeSheetScreen(
     backNavigation: () -> Unit,
-    viewModel: YatzySheetViewModel = viewModel(factory = YatzySheetViewModel.factory(LocalContext.current))
+    viewModel: YatzySheetViewModel = viewModel(factory = YatzySheetViewModel.factory())
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -84,8 +83,7 @@ fun YatzeeSheetScreen(
                                     .padding(4.dp)
                                     .clickable {
                                         viewModel.completeTurn(
-                                            score.type,
-                                            uiState.possibleOutcomes[score.type]
+                                            score.copy(value = uiState.possibleOutcomes[score.type]!!)
                                         )
                                     },
                                 text = score.type.name
@@ -99,10 +97,7 @@ fun YatzeeSheetScreen(
                                     )
                                     .padding(4.dp)
                                     .clickable {
-                                        viewModel.completeTurn(
-                                            score.type,
-                                            null
-                                        )
+                                        viewModel.completeTurn(score.copy(isStroke = true))
                                     },
                                 text = score.type.name
                             )
