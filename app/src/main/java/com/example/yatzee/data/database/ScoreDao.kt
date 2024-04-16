@@ -19,6 +19,9 @@ interface ScoreDao {
     @Query("SELECT * FROM Score")
     fun getPlayerScores(): Flow<List<Score>>
 
+    @Query("SELECT * FROM Score WHERE playerName = :playerName")
+    fun getPlayerScores(playerName: String): List<Score>
+
     @Query("SELECT * FROM Score WHERE playerName = :playerName AND type = :type")
     fun getSpecificScore(playerName: String, type: YatzyScoreType) : Score
 

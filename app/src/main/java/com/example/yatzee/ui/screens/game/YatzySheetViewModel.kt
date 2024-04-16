@@ -10,7 +10,7 @@ import com.example.yatzee.YatzyApplication
 import com.example.yatzee.YatzyGame
 import com.example.yatzee.checkLowerSection
 import com.example.yatzee.checkUpperSection
-import com.example.yatzee.data.database.YatzyDatabase
+import com.example.yatzee.data.repository.ScoresRepository
 import com.example.yatzee.models.Dice
 import com.example.yatzee.models.Score
 import com.example.yatzee.models.YatzyScoreType
@@ -36,14 +36,18 @@ data class YatzySheetUiState(
     val winner: String = ""
 )
 
-class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
+class YatzySheetViewModel(private val scoresRepository: ScoresRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(YatzySheetUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
+        getScores()
+    }
+
+    private fun getScores() {
         viewModelScope.launch {
-            db.scoreDao().getPlayerScores().collect { playerScores ->
+            scoresRepository.getPlayerScores().collect { playerScores ->
                 val scoreBoard = playerScores.map { it.playerName }.associateWith { player ->
                     playerScores.filter { it.playerName == player }
                 }
@@ -63,7 +67,7 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
     }
 
     fun throwDices() {
-        val dices = _uiState.value.dices
+        val dices = uiState.value.dices
         val dicesAfterThrow = mutableListOf<Dice>()
 
         for (i in dices.indices) {
@@ -87,7 +91,7 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
 
     fun changeLockedState(index: Int) {
         val dices = mutableListOf<Dice>()
-        dices.addAll(_uiState.value.dices)
+        dices.addAll(uiState.value.dices)
         dices[index] = dices[index].copy(isLocked = !dices[index].isLocked)
 
         _uiState.update {
@@ -97,49 +101,21 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
         }
     }
 
-    fun completeTurn(type: YatzyScoreType, score: Int?) {
-        registerScore(type, score)
-        startNextTurn()
+    fun completeTurn(score: Score) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { scoresRepository.registerScore(score) }
+        }
+        nextTurn()
     }
 
     fun resetGame() {
-        YatzyGame.resetGame()
+        viewModelScope.launch {
+            YatzyGame.resetGame()
+            scoresRepository.clearScores()
+        }
     }
 
-    private fun registerScore(type: YatzyScoreType, score: Int?) {
-        val player = YatzyGame.playerTurn
-
-        if (score == null) {
-            addScore(player, type, null)
-            return
-        }
-
-        uiState.value.scores[player]?.let { playerScore ->
-            var upperSum = playerScore.find { it.type == YatzyScoreType.UpperSum }?.value ?: 0
-            var totalSum = playerScore.find { it.type == YatzyScoreType.Sum }?.value ?: 0
-            upperSum += if (type.isUpperHalf()) score else 0
-            totalSum += score
-
-            val bonus: Int =
-                if (playerScore.find { it.type == YatzyScoreType.Bonus }?.value == 50) 0
-                else if (upperSum >= 63) 50
-                else 0
-
-            if (type.isUpperHalf()) {
-                addScore(player, YatzyScoreType.UpperSum, upperSum)
-            }
-
-            if (bonus == 50) {
-                addScore(player, YatzyScoreType.Bonus, bonus)
-            }
-
-            addScore(player, type, score)
-            addScore(player, YatzyScoreType.Sum, totalSum + bonus)
-        }
-
-    }
-
-    private fun startNextTurn() {
+    private fun nextTurn() {
         YatzyGame.nextPlayer()
         _uiState.update {
             it.copy(
@@ -160,7 +136,7 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
         _uiState.update { currentUiState ->
             currentUiState.copy(
                 possibleOutcomes = possibleOutcomes.filter { scores ->
-                    scores.key in uiState.value.scores[_uiState.value.playerTurn]!!.filter { score -> score.value == 0 }
+                    scores.key in uiState.value.scores[uiState.value.playerTurn]!!.filter { score -> score.value == 0 }
                         .map { it.type }
                 }
             )
@@ -168,7 +144,7 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
     }
 
     private fun checkPossibleToStroke() {
-        uiState.value.scores[_uiState.value.playerTurn]?.let { playerScore ->
+        uiState.value.scores[uiState.value.playerTurn]?.let { playerScore ->
             val tempList: MutableMap<YatzyScoreType, Score> =
                 playerScore.associateBy { it.type }.toMutableMap()
             tempList.remove(YatzyScoreType.Bonus)
@@ -186,29 +162,12 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
         }
     }
 
-    private fun addScore(player: String, type: YatzyScoreType, score: Int?) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val element = db.scoreDao().getSpecificScore(player, type)
-                db.scoreDao().addPlayerScore(
-                    Score(
-                        id = element.id,
-                        playerName = player,
-                        type = type,
-                        value = score ?: 0,
-                        isStroke = score == null
-                    )
-                )
-            }
-        }
-    }
-
     companion object {
         fun factory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = this[APPLICATION_KEY] as YatzyApplication
 
-                YatzySheetViewModel(db = YatzyDatabase.getInstance(application))
+                YatzySheetViewModel(application.container.scoresRepository)
             }
         }
     }
