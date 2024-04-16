@@ -1,15 +1,16 @@
 package com.example.yatzee.ui.screens.game
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.yatzee.YatzyApplication
 import com.example.yatzee.YatzyGame
 import com.example.yatzee.checkLowerSection
 import com.example.yatzee.checkUpperSection
-import com.example.yatzee.data.YatzyDatabase
+import com.example.yatzee.data.database.YatzyDatabase
 import com.example.yatzee.models.Dice
 import com.example.yatzee.models.Score
 import com.example.yatzee.models.YatzyScoreType
@@ -203,8 +204,12 @@ class YatzySheetViewModel(private val db: YatzyDatabase) : ViewModel() {
     }
 
     companion object {
-        fun factory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-            initializer { YatzySheetViewModel(db = YatzyDatabase.getInstance(context)) }
+        fun factory(): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = this[APPLICATION_KEY] as YatzyApplication
+
+                YatzySheetViewModel(db = YatzyDatabase.getInstance(application))
+            }
         }
     }
 

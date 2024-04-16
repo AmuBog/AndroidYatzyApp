@@ -8,7 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yatzee.data.YatzyDatabase
+import com.example.yatzee.data.database.YatzyDatabase
 import com.example.yatzee.ui.screens.menu.MenuScreen
 import com.example.yatzee.ui.screens.game.YatzeeSheetScreen
 import com.example.yatzee.ui.theme.YatzeeTheme

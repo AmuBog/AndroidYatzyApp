@@ -1,4 +1,4 @@
-package com.example.yatzee.data
+package com.example.yatzee.data.database
 
 import android.content.Context
 import androidx.room.Database

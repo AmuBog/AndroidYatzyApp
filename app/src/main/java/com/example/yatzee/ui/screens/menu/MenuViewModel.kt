@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yatzee.YatzyGame
-import com.example.yatzee.data.YatzyDatabase
+import com.example.yatzee.data.database.YatzyDatabase
 import com.example.yatzee.models.Score
 import com.example.yatzee.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers

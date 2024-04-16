@@ -1,4 +1,4 @@
-package com.example.yatzee.data
+package com.example.yatzee.data.database
 
 import androidx.room.Dao
 import androidx.room.Insert
