@@ -10,9 +10,9 @@ import com.example.yatzee.ui.screens.highscore.HighscoreScreen
 import com.example.yatzee.ui.screens.menu.MenuScreen
 
 object Destinations {
-    const val HIGHSCORE = "highscore"
     const val MAIN_MENU = "main_menu"
     const val YATZY_GAME = "yatzy_game"
+    const val HIGHSCORE = "highscore"
 }
 
 @Composable

@@ -2,7 +2,7 @@ package com.example.yatzee
 
 object YatzyGame {
     private var playerTurnIndex = 0
-    var turn = 1
+    var turn = 14
     val players = mutableListOf<String>()
     val playerTurn
         get() = if (players.isNotEmpty()) {
