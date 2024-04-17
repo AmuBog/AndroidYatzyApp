@@ -12,6 +12,7 @@ import com.example.yatzy.checkLowerSection
 import com.example.yatzy.checkUpperSection
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
+import com.example.yatzy.domain.RegisterScoreUseCase
 import com.example.yatzy.models.Dice
 import com.example.yatzy.models.Highscore
 import com.example.yatzy.models.Score
@@ -41,6 +42,7 @@ data class YatzySheetUiState(
 class YatzySheetViewModel(
     private val scoresRepository: ScoresRepository,
     private val highscoreRepository: HighscoreRepository,
+    private val registerScoreUseCase: RegisterScoreUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(YatzySheetUiState())
@@ -107,9 +109,7 @@ class YatzySheetViewModel(
     }
 
     fun completeTurn(score: Score) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) { scoresRepository.registerScore(score) }
-        }
+        viewModelScope.launch { registerScoreUseCase(score) }
         nextTurn()
     }
 
@@ -183,7 +183,8 @@ class YatzySheetViewModel(
 
                 YatzySheetViewModel(
                     application.container.scoresRepository,
-                    application.container.highscoreRepository
+                    application.container.highscoreRepository,
+                    application.container.registerScoreUseCase
                 )
             }
         }
