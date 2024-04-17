@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.yatzee"
+    namespace = "com.example.yatzy"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.yatzee"
+        applicationId = "com.example.yatzy"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
