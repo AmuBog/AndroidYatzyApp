@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.yatzee.models.Highscore
 import com.example.yatzee.models.Score
 
-@Database(entities = [Score::class], version = 2)
+@Database(entities = [Score::class, Highscore::class], version = 3)
 abstract class YatzyDatabase : RoomDatabase() {
     abstract fun scoreDao(): ScoreDao
+    abstract fun highscoreDao(): HighscoreDao
 
     companion object {
         private const val Database_NAME = "yatzy.db"

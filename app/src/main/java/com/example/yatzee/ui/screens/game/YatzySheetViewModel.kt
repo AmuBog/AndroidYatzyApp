@@ -10,8 +10,10 @@ import com.example.yatzee.YatzyApplication
 import com.example.yatzee.YatzyGame
 import com.example.yatzee.checkLowerSection
 import com.example.yatzee.checkUpperSection
+import com.example.yatzee.data.repository.HighscoreRepository
 import com.example.yatzee.data.repository.ScoresRepository
 import com.example.yatzee.models.Dice
+import com.example.yatzee.models.Highscore
 import com.example.yatzee.models.Score
 import com.example.yatzee.models.YatzyScoreType
 import com.example.yatzee.throwDice
@@ -36,7 +38,10 @@ data class YatzySheetUiState(
     val winner: String = ""
 )
 
-class YatzySheetViewModel(private val scoresRepository: ScoresRepository) : ViewModel() {
+class YatzySheetViewModel(
+    private val scoresRepository: ScoresRepository,
+    private val highscoreRepository: HighscoreRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(YatzySheetUiState())
     val uiState = _uiState.asStateFlow()
@@ -111,6 +116,15 @@ class YatzySheetViewModel(private val scoresRepository: ScoresRepository) : View
     fun resetGame() {
         viewModelScope.launch {
             YatzyGame.resetGame()
+            withContext(Dispatchers.IO) {
+                uiState.value.scores.map {
+                    it.key to it.value.find { it.type == YatzyScoreType.Sum }
+                }.forEach {
+                    highscoreRepository.addHighscore(
+                        Highscore(playerName = it.first, score = it.second?.value ?: 0)
+                    )
+                }
+            }
             scoresRepository.clearScores()
         }
     }
@@ -163,11 +177,14 @@ class YatzySheetViewModel(private val scoresRepository: ScoresRepository) : View
     }
 
     companion object {
-        fun factory(): ViewModelProvider.Factory = viewModelFactory {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = this[APPLICATION_KEY] as YatzyApplication
 
-                YatzySheetViewModel(application.container.scoresRepository)
+                YatzySheetViewModel(
+                    application.container.scoresRepository,
+                    application.container.highscoreRepository
+                )
             }
         }
     }
