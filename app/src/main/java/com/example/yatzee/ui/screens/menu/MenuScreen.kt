@@ -36,6 +36,7 @@ import com.example.yatzee.ui.theme.YatzeeTheme
 @Composable
 fun MenuScreen(
     navigateToYatzyGame: () -> Unit,
+    navigateToHighscores: () -> Unit,
     viewModel: MenuViewModel = viewModel(
         factory = MenuViewModel.factory(LocalContext.current)
     )
@@ -102,7 +103,9 @@ fun MenuScreen(
                 SecondaryButton(
                     text = stringResource(R.string.highscore),
                     icon = Icons.Default.List,
-                    onClick = {}
+                    onClick = {
+                        navigateToHighscores()
+                    }
                 )
                 SecondaryButton(
                     text = stringResource(R.string.previous_games),
@@ -127,7 +130,8 @@ fun MenuScreen(
 private fun MenuScreenPreview() {
     YatzeeTheme {
         MenuScreen(
-            navigateToYatzyGame = {}
+            navigateToYatzyGame = {},
+            navigateToHighscores = {}
         )
     }
 }

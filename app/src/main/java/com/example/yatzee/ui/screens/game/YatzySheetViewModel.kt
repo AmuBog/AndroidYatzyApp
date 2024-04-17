@@ -163,7 +163,7 @@ class YatzySheetViewModel(private val scoresRepository: ScoresRepository) : View
     }
 
     companion object {
-        fun factory(): ViewModelProvider.Factory = viewModelFactory {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = this[APPLICATION_KEY] as YatzyApplication
 

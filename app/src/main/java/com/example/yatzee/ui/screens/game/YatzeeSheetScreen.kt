@@ -45,7 +45,7 @@ import com.example.yatzee.ui.theme.YatzeeTheme
 @Composable
 fun YatzeeSheetScreen(
     backNavigation: () -> Unit,
-    viewModel: YatzySheetViewModel = viewModel(factory = YatzySheetViewModel.factory())
+    viewModel: YatzySheetViewModel = viewModel(factory = YatzySheetViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
