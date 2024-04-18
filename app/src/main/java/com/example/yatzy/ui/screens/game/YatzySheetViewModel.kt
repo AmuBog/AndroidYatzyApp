@@ -11,6 +11,7 @@ import com.example.yatzy.YatzyApplication
 import com.example.yatzy.data.DicePool
 import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.domain.CalculatePossibleScoresUseCase
+import com.example.yatzy.domain.CalculatePossibleStrokeUseCase
 import com.example.yatzy.domain.RegisterHighscoreUseCase
 import com.example.yatzy.domain.RegisterScoreUseCase
 import com.example.yatzy.models.Dice
@@ -38,10 +39,10 @@ data class YatzySheetUiState(
 class YatzySheetViewModel(
     private val scoresRepository: ScoresRepository,
     private val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase,
+    private val calculatePossibleStrokeUseCase: CalculatePossibleStrokeUseCase,
     private val registerScoreUseCase: RegisterScoreUseCase,
     private val registerHighscoreUseCase: RegisterHighscoreUseCase
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(YatzySheetUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -64,21 +65,17 @@ class YatzySheetViewModel(
     }
 
     fun throwDices() = viewModelScope.launch {
+        val player = uiState.value.playerTurn
         val dicesAfterThrow = DicePool.throwDices()
-        val possibleOutcomes = calculatePossibleScoresUseCase(
-            uiState.value.playerTurn,
-            dicesAfterThrow
-        )
 
         _uiState.update {
             it.copy(
                 dices = dicesAfterThrow,
-                possibleOutcomes = possibleOutcomes,
+                possibleOutcomes = calculatePossibleScoresUseCase(player, dicesAfterThrow),
+                possibleStrokes = calculatePossibleStrokeUseCase(player),
                 numberOfThrows = it.numberOfThrows - 1
             )
         }
-
-        checkPossibleToStroke()
     }
 
     fun lockDice(index: Int) {
@@ -111,25 +108,6 @@ class YatzySheetViewModel(
         }
     }
 
-    private fun checkPossibleToStroke() {
-        uiState.value.scores[uiState.value.playerTurn]?.let { playerScore ->
-            val tempList: MutableMap<YatzyScoreType, Score> =
-                playerScore.associateBy { it.type }.toMutableMap()
-            tempList.remove(YatzyScoreType.Bonus)
-            tempList.remove(YatzyScoreType.UpperSum)
-            tempList.remove(YatzyScoreType.Sum)
-
-            val possibleToStroke = tempList.filter { !it.value.isStroke && it.value.value == 0 }
-                .map { it.key to it.value.value }.toMap()
-
-            _uiState.update { currentUiState ->
-                currentUiState.copy(
-                    possibleStrokes = possibleToStroke
-                )
-            }
-        }
-    }
-
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
@@ -138,6 +116,7 @@ class YatzySheetViewModel(
                 YatzySheetViewModel(
                     application.container.scoresRepository,
                     application.container.calculatePossibleScoresUseCase,
+                    application.container.calculatePossibleStrokeUseCase,
                     application.container.registerScoreUseCase,
                     application.container.registerHighscoreUseCase,
                 )
