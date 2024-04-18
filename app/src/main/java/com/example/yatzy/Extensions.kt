@@ -17,11 +17,6 @@ import com.example.yatzy.models.YatzyScoreType.Threes
 import com.example.yatzy.models.YatzyScoreType.TwoPairs
 import com.example.yatzy.models.YatzyScoreType.Twos
 import com.example.yatzy.models.YatzyScoreType.Yatzy
-import kotlin.random.Random
-import kotlin.random.nextInt
-
-
-fun throwDice() = Random.nextInt(1..6)
 
 fun List<Dice>.checkUpperSection() = mapOf(
     Ones to this.filter { it.value == 1 }.sumOf { it.value },

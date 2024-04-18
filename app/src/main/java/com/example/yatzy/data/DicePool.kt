@@ -1,14 +1,11 @@
 package com.example.yatzy.data
 
+import androidx.compose.runtime.mutableStateListOf
 import com.example.yatzy.models.Dice
 
 object DicePool {
 
-    val dices = mutableListOf<Dice>()
-
-    init {
-        resetDices()
-    }
+    val dices = mutableStateListOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5))
 
     fun throwDices(): List<Dice> {
         val dices = dices
@@ -32,10 +29,8 @@ object DicePool {
 
     fun resetDices(): List<Dice> {
         dices.clear()
-        dices.addAll(initialDices)
+        dices.addAll(listOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5)))
         return dices
     }
-
-    private val initialDices = listOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5))
 
 }

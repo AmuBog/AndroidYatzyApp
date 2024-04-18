@@ -4,12 +4,14 @@ import android.content.Context
 import com.example.yatzy.data.database.YatzyDatabase
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
+import com.example.yatzy.domain.CalculatePossibleScoresUseCase
 import com.example.yatzy.domain.RegisterScoreUseCase
 
 interface AppContainer {
     val scoresRepository: ScoresRepository
     val highscoreRepository: HighscoreRepository
     val registerScoreUseCase: RegisterScoreUseCase
+    val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -29,6 +31,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
     // Use case
     override val registerScoreUseCase: RegisterScoreUseCase by lazy {
         RegisterScoreUseCase(scoresRepository)
+    }
+
+    override val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase by lazy {
+        CalculatePossibleScoresUseCase(scoresRepository)
     }
 
 }

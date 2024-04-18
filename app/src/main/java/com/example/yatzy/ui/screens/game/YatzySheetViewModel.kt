@@ -13,6 +13,7 @@ import com.example.yatzy.checkUpperSection
 import com.example.yatzy.data.DicePool
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
+import com.example.yatzy.domain.CalculatePossibleScoresUseCase
 import com.example.yatzy.domain.RegisterScoreUseCase
 import com.example.yatzy.models.Dice
 import com.example.yatzy.models.Highscore
@@ -42,7 +43,8 @@ data class YatzySheetUiState(
 class YatzySheetViewModel(
     private val scoresRepository: ScoresRepository,
     private val highscoreRepository: HighscoreRepository,
-    private val registerScoreUseCase: RegisterScoreUseCase
+    private val registerScoreUseCase: RegisterScoreUseCase,
+    private val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(YatzySheetUiState())
@@ -76,18 +78,25 @@ class YatzySheetViewModel(
     fun throwDices() {
         val dicesAfterThrow = DicePool.throwDices()
 
-        _uiState.update {
-            it.copy(
-                dices = dicesAfterThrow,
-                numberOfThrows = it.numberOfThrows - 1
-            )
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    dices = dicesAfterThrow,
+                    possibleOutcomes = calculatePossibleScoresUseCase(
+                        uiState.value.playerTurn,
+                        dicesAfterThrow
+                    ),
+                    numberOfThrows = it.numberOfThrows - 1
+                )
+            }
         }
 
-        checkPossibleOutcomes(dicesAfterThrow)
+        // checkPossibleOutcomes(dicesAfterThrow)
         checkPossibleToStroke()
     }
 
     fun lockDice(index: Int) {
+
         _uiState.update {
             it.copy(
                 dices = DicePool.lockDice(index)
@@ -171,7 +180,8 @@ class YatzySheetViewModel(
                 YatzySheetViewModel(
                     application.container.scoresRepository,
                     application.container.highscoreRepository,
-                    application.container.registerScoreUseCase
+                    application.container.registerScoreUseCase,
+                    application.container.calculatePossibleScoresUseCase
                 )
             }
         }
