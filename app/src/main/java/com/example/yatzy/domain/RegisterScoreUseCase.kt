@@ -12,14 +12,14 @@ class RegisterScoreUseCase(private val repository: ScoresRepository) {
         registerScore(score)
     }
 
-    private suspend fun registerScore(score: Score) {
+    private fun registerScore(score: Score) {
         repository.addScore(score)
         if (score.isStroke) return
         addSumAndBonus(score)
     }
 
-    private suspend fun addSumAndBonus(score: Score) {
-        val playerScore = repository.getPlayerScores(score.playerName)
+    private fun addSumAndBonus(score: Score) {
+        val playerScore = repository.getScoreBoard(score.playerName)
 
         var upperSum = playerScore.find { it.type == YatzyScoreType.UpperSum }?.value ?: 0
         var totalSum = playerScore.find { it.type == YatzyScoreType.Sum }?.value ?: 0

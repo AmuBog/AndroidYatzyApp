@@ -4,12 +4,16 @@ import com.example.yatzy.data.database.ScoreDao
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class ScoresRepository(private val scoreDao: ScoreDao) {
-    fun getPlayerScores() = scoreDao.getPlayerScores()
+    fun getScoreBoard() = scoreDao.getPlayerScores().map { scores ->
+        scores.map { it.playerName }
+            .associateWith { player -> scores.filter { it.playerName == player } }
+    }
 
-    fun getPlayerScores(playerName: String) = scoreDao.getPlayerScores(playerName)
+    fun getScoreBoard(playerName: String) = scoreDao.getPlayerScores(playerName)
 
     fun getSpecificScore(playerName: String, yatzyScoreType: YatzyScoreType) =
         scoreDao.getSpecificScore(playerName, yatzyScoreType)

@@ -2,13 +2,16 @@ package com.example.yatzy.data.repository
 
 import com.example.yatzy.data.database.HighscoreDao
 import com.example.yatzy.models.Highscore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class HighscoreRepository(val highscoreDao: HighscoreDao) {
+class HighscoreRepository(private val highscoreDao: HighscoreDao) {
 
-    fun addHighscore(highscore: Highscore) {
-        highscoreDao.addHighscore(highscore)
+    suspend fun addHighscore(highscore: Highscore) {
+        withContext(Dispatchers.IO) { highscoreDao.addHighscore(highscore) }
     }
 
-    fun getHighscores(): List<Highscore> = highscoreDao.getHighscores()
+    suspend fun getHighscores(): List<Highscore> =
+        withContext(Dispatchers.IO) { highscoreDao.getHighscores() }
 
 }

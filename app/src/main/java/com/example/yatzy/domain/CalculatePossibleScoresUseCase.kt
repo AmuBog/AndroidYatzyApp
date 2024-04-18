@@ -14,7 +14,7 @@ class CalculatePossibleScoresUseCase(private val scoresRepository: ScoresReposit
         withContext(Dispatchers.IO) { checkPossibleOutcomes(player, dices) }
 
     private fun checkPossibleOutcomes(player: String, dices: List<Dice>): Map<YatzyScoreType, Int> {
-        val potentialScores = scoresRepository.getPlayerScores(player).filter { it.value == 0 }
+        val potentialScores = scoresRepository.getScoreBoard(player).filter { it.value == 0 }
         val possibleOutcomes: MutableMap<YatzyScoreType, Int> = mutableMapOf()
         possibleOutcomes.putAll(dices.checkUpperSection())
         possibleOutcomes.putAll(dices.checkLowerSection())

@@ -10,12 +10,10 @@ import com.example.yatzy.YatzyApplication
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.models.Highscore
 import com.example.yatzy.ui.screens.menu.ViewState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class HighscoreUiState(
     val viewState: ViewState = ViewState.Idle,
@@ -30,16 +28,8 @@ class HighscoreViewModel(private val repository: HighscoreRepository) : ViewMode
         getHighscores()
     }
 
-    private fun getHighscores() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                _uiState.update {
-                    it.copy(
-                        highscores = repository.getHighscores()
-                    )
-                }
-            }
-        }
+    private fun getHighscores() = viewModelScope.launch {
+        _uiState.update { it.copy(highscores = repository.getHighscores()) }
     }
 
     companion object {

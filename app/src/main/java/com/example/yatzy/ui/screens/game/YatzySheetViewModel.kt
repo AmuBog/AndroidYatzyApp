@@ -8,8 +8,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yatzy.GameState
 import com.example.yatzy.YatzyApplication
-import com.example.yatzy.checkLowerSection
-import com.example.yatzy.checkUpperSection
 import com.example.yatzy.data.DicePool
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
@@ -20,12 +18,10 @@ import com.example.yatzy.models.Highscore
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import com.example.yatzy.ui.screens.menu.ViewState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class YatzySheetUiState(
     val viewState: ViewState = ViewState.Idle,
@@ -54,53 +50,49 @@ class YatzySheetViewModel(
         getScores()
     }
 
-    private fun getScores() {
-        viewModelScope.launch {
-            scoresRepository.getPlayerScores().collect { playerScores ->
-                val scoreBoard = playerScores.map { it.playerName }.associateWith { player ->
-                    playerScores.filter { it.playerName == player }
-                }
-                val highScore =
-                    playerScores.filter { it.type == YatzyScoreType.Sum }.maxByOrNull { it.value }
-                val winner = highScore?.playerName
+    private fun getScores() = viewModelScope.launch {
+        scoresRepository.getScoreBoard().collect { scoreBoard ->
+            val highScore = scoreBoard.flatMap { it.value }.maxByOrNull { it.value }
 
-                _uiState.update {
-                    it.copy(
-                        scores = scoreBoard,
-                        highscore = highScore?.value ?: 0,
-                        winner = winner ?: "Unknown"
+            _uiState.update {
+                it.copy(
+                    scores = scoreBoard,
+                    highscore = highScore?.value ?: 0,
+                    winner = highScore?.playerName ?: "Unknown"
+                )
+            }
+
+            if (GameState.turn == 15 && GameState.playerTurn == GameState.players.last()) {
+                scoreBoard.flatMap { it.value }.filter { it.type == YatzyScoreType.Sum }.forEach {
+                    highscoreRepository.addHighscore(
+                        Highscore(playerName = it.playerName, score = it.value)
                     )
                 }
             }
         }
     }
 
-    fun throwDices() {
+    fun throwDices() = viewModelScope.launch {
         val dicesAfterThrow = DicePool.throwDices()
+        val possibleOutcomes = calculatePossibleScoresUseCase(
+            uiState.value.playerTurn,
+            dicesAfterThrow
+        )
 
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    dices = dicesAfterThrow,
-                    possibleOutcomes = calculatePossibleScoresUseCase(
-                        uiState.value.playerTurn,
-                        dicesAfterThrow
-                    ),
-                    numberOfThrows = it.numberOfThrows - 1
-                )
-            }
+        _uiState.update {
+            it.copy(
+                dices = dicesAfterThrow,
+                possibleOutcomes = possibleOutcomes,
+                numberOfThrows = it.numberOfThrows - 1
+            )
         }
 
-        // checkPossibleOutcomes(dicesAfterThrow)
         checkPossibleToStroke()
     }
 
     fun lockDice(index: Int) {
-
         _uiState.update {
-            it.copy(
-                dices = DicePool.lockDice(index)
-            )
+            it.copy(dices = DicePool.lockDice(index))
         }
     }
 
@@ -109,20 +101,10 @@ class YatzySheetViewModel(
         nextTurn()
     }
 
-    fun resetGame() {
-        viewModelScope.launch {
-            GameState.resetGame()
-            withContext(Dispatchers.IO) {
-                uiState.value.scores.map {
-                    it.key to it.value.find { it.type == YatzyScoreType.Sum }
-                }.forEach {
-                    highscoreRepository.addHighscore(
-                        Highscore(playerName = it.first, score = it.second?.value ?: 0)
-                    )
-                }
-            }
-            scoresRepository.clearScores()
-        }
+    fun resetGame() = viewModelScope.launch {
+        GameState.resetGame()
+        // Finish game use case ?
+        scoresRepository.clearScores()
     }
 
     private fun nextTurn() {
@@ -134,21 +116,6 @@ class YatzySheetViewModel(
                 possibleOutcomes = mapOf(),
                 dices = DicePool.resetDices(),
                 turn = GameState.turn
-            )
-        }
-    }
-
-    private fun checkPossibleOutcomes(dices: List<Dice>) {
-        val possibleOutcomes: MutableMap<YatzyScoreType, Int> = mutableMapOf()
-        possibleOutcomes.putAll(dices.checkUpperSection())
-        possibleOutcomes.putAll(dices.checkLowerSection())
-
-        _uiState.update { currentUiState ->
-            currentUiState.copy(
-                possibleOutcomes = possibleOutcomes.filter { scores ->
-                    scores.key in uiState.value.scores[uiState.value.playerTurn]!!.filter { score -> score.value == 0 }
-                        .map { it.type }
-                }
             )
         }
     }
