@@ -1,6 +1,6 @@
 package com.example.yatzy
 
-object YatzyGame {
+object GameState {
     private var playerTurnIndex = 0
     var turn = 1
     val players = mutableListOf<String>()
@@ -19,6 +19,7 @@ object YatzyGame {
         turn = 1
         players.clear()
     }
+
     fun nextPlayer() {
         if (playerTurnIndex + 1 >= players.size) {
             turn++

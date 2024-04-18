@@ -182,7 +182,7 @@ fun YatzySheetScreen(
                         Dice(
                             dice = dice,
                             enabled = uiState.numberOfThrows < 3,
-                            onDiceLocked = { viewModel.changeLockedState(index) }
+                            onDiceLocked = { viewModel.lockDice(index) }
                         )
                     }
                 }

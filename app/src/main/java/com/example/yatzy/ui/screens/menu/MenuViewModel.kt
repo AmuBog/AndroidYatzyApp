@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.yatzy.YatzyGame
+import com.example.yatzy.GameState
 import com.example.yatzy.data.database.YatzyDatabase
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
@@ -65,7 +65,7 @@ class MenuViewModel(val db: YatzyDatabase) : ViewModel() {
     }
 
     fun checkOngoingGame() {
-        _uiState.update { it.copy(hasOngoingGame = YatzyGame.players.isNotEmpty()) }
+        _uiState.update { it.copy(hasOngoingGame = GameState.players.isNotEmpty()) }
     }
 
     fun addPlayer() {
@@ -97,9 +97,9 @@ class MenuViewModel(val db: YatzyDatabase) : ViewModel() {
 
     fun startGame() {
         _uiState.update { it.copy(viewState = ViewState.Loading) }
-        YatzyGame.players.clear()
-        YatzyGame.players.addAll(uiState.value.players)
-        YatzyGame.players.forEach { player ->
+        GameState.players.clear()
+        GameState.players.addAll(uiState.value.players)
+        GameState.players.forEach { player ->
             val playerScoreCard = mutableListOf<Score>()
             YatzyScoreType.entries.forEach { type ->
                 playerScoreCard.add(

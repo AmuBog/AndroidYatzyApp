@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.yatzy.GameState
 import com.example.yatzy.YatzyApplication
-import com.example.yatzy.YatzyGame
 import com.example.yatzy.checkLowerSection
 import com.example.yatzy.checkUpperSection
+import com.example.yatzy.data.DicePool
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.domain.RegisterScoreUseCase
@@ -17,7 +18,6 @@ import com.example.yatzy.models.Dice
 import com.example.yatzy.models.Highscore
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
-import com.example.yatzy.throwDice
 import com.example.yatzy.ui.screens.menu.ViewState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 data class YatzySheetUiState(
     val viewState: ViewState = ViewState.Idle,
     val numberOfThrows: Int = 3,
-    val playerTurn: String = YatzyGame.playerTurn,
+    val playerTurn: String = GameState.playerTurn,
     val scores: Map<String, List<Score>> = mapOf(),
     val possibleOutcomes: Map<YatzyScoreType, Int> = mapOf(),
     val possibleStrokes: Map<YatzyScoreType, Int> = mapOf(),
@@ -74,16 +74,7 @@ class YatzySheetViewModel(
     }
 
     fun throwDices() {
-        val dices = uiState.value.dices
-        val dicesAfterThrow = mutableListOf<Dice>()
-
-        for (i in dices.indices) {
-            if (dices[i].isLocked) {
-                dicesAfterThrow.add(dices[i])
-            } else {
-                dicesAfterThrow.add(Dice(throwDice()))
-            }
-        }
+        val dicesAfterThrow = DicePool.throwDices()
 
         _uiState.update {
             it.copy(
@@ -96,14 +87,10 @@ class YatzySheetViewModel(
         checkPossibleToStroke()
     }
 
-    fun changeLockedState(index: Int) {
-        val dices = mutableListOf<Dice>()
-        dices.addAll(uiState.value.dices)
-        dices[index] = dices[index].copy(isLocked = !dices[index].isLocked)
-
+    fun lockDice(index: Int) {
         _uiState.update {
             it.copy(
-                dices = dices
+                dices = DicePool.lockDice(index)
             )
         }
     }
@@ -115,7 +102,7 @@ class YatzySheetViewModel(
 
     fun resetGame() {
         viewModelScope.launch {
-            YatzyGame.resetGame()
+            GameState.resetGame()
             withContext(Dispatchers.IO) {
                 uiState.value.scores.map {
                     it.key to it.value.find { it.type == YatzyScoreType.Sum }
@@ -130,14 +117,14 @@ class YatzySheetViewModel(
     }
 
     private fun nextTurn() {
-        YatzyGame.nextPlayer()
+        GameState.nextPlayer()
         _uiState.update {
             it.copy(
                 numberOfThrows = 3,
-                playerTurn = YatzyGame.playerTurn,
+                playerTurn = GameState.playerTurn,
                 possibleOutcomes = mapOf(),
-                dices = listOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5)),
-                turn = YatzyGame.turn
+                dices = DicePool.resetDices(),
+                turn = GameState.turn
             )
         }
     }
