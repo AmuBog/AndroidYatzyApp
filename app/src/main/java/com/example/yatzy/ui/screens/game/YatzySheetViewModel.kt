@@ -9,12 +9,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yatzy.GameState
 import com.example.yatzy.YatzyApplication
 import com.example.yatzy.data.DicePool
-import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.domain.CalculatePossibleScoresUseCase
+import com.example.yatzy.domain.RegisterHighscoreUseCase
 import com.example.yatzy.domain.RegisterScoreUseCase
 import com.example.yatzy.models.Dice
-import com.example.yatzy.models.Highscore
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import com.example.yatzy.ui.screens.menu.ViewState
@@ -38,9 +37,9 @@ data class YatzySheetUiState(
 
 class YatzySheetViewModel(
     private val scoresRepository: ScoresRepository,
-    private val highscoreRepository: HighscoreRepository,
+    private val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase,
     private val registerScoreUseCase: RegisterScoreUseCase,
-    private val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase
+    private val registerHighscoreUseCase: RegisterHighscoreUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(YatzySheetUiState())
@@ -60,14 +59,6 @@ class YatzySheetViewModel(
                     highscore = highScore?.value ?: 0,
                     winner = highScore?.playerName ?: "Unknown"
                 )
-            }
-
-            if (GameState.turn == 15 && GameState.playerTurn == GameState.players.last()) {
-                scoreBoard.flatMap { it.value }.filter { it.type == YatzyScoreType.Sum }.forEach {
-                    highscoreRepository.addHighscore(
-                        Highscore(playerName = it.playerName, score = it.value)
-                    )
-                }
             }
         }
     }
@@ -103,7 +94,7 @@ class YatzySheetViewModel(
 
     fun resetGame() = viewModelScope.launch {
         GameState.resetGame()
-        // Finish game use case ?
+        registerHighscoreUseCase()
         scoresRepository.clearScores()
     }
 
@@ -146,9 +137,9 @@ class YatzySheetViewModel(
 
                 YatzySheetViewModel(
                     application.container.scoresRepository,
-                    application.container.highscoreRepository,
+                    application.container.calculatePossibleScoresUseCase,
                     application.container.registerScoreUseCase,
-                    application.container.calculatePossibleScoresUseCase
+                    application.container.registerHighscoreUseCase,
                 )
             }
         }

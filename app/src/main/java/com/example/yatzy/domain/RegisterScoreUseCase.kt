@@ -19,7 +19,7 @@ class RegisterScoreUseCase(private val repository: ScoresRepository) {
     }
 
     private fun addSumAndBonus(score: Score) {
-        val playerScore = repository.getScoreBoard(score.playerName)
+        val playerScore = repository.getPlayerScores(score.playerName)
 
         var upperSum = playerScore.find { it.type == YatzyScoreType.UpperSum }?.value ?: 0
         var totalSum = playerScore.find { it.type == YatzyScoreType.Sum }?.value ?: 0

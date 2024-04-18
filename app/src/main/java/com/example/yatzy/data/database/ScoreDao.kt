@@ -25,6 +25,9 @@ interface ScoreDao {
     @Query("SELECT * FROM Score WHERE playerName = :playerName AND type = :type")
     fun getSpecificScore(playerName: String, type: YatzyScoreType) : Score
 
+    @Query("SELECT * FROM Score WHERE type = 'Sum'")
+    fun getPlayerSums(): List<Score>
+
     @Query("DELETE FROM Score")
     fun deleteAllScores()
 

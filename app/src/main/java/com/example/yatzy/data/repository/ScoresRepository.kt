@@ -13,7 +13,9 @@ class ScoresRepository(private val scoreDao: ScoreDao) {
             .associateWith { player -> scores.filter { it.playerName == player } }
     }
 
-    fun getScoreBoard(playerName: String) = scoreDao.getPlayerScores(playerName)
+    fun getPlayerScores(playerName: String) = scoreDao.getPlayerScores(playerName)
+
+    fun getPlayerSums() = scoreDao.getPlayerSums()
 
     fun getSpecificScore(playerName: String, yatzyScoreType: YatzyScoreType) =
         scoreDao.getSpecificScore(playerName, yatzyScoreType)

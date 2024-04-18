@@ -5,13 +5,15 @@ import com.example.yatzy.data.database.YatzyDatabase
 import com.example.yatzy.data.repository.HighscoreRepository
 import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.domain.CalculatePossibleScoresUseCase
+import com.example.yatzy.domain.RegisterHighscoreUseCase
 import com.example.yatzy.domain.RegisterScoreUseCase
 
 interface AppContainer {
     val scoresRepository: ScoresRepository
     val highscoreRepository: HighscoreRepository
-    val registerScoreUseCase: RegisterScoreUseCase
     val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase
+    val registerScoreUseCase: RegisterScoreUseCase
+    val registerHighscoreUseCase: RegisterHighscoreUseCase
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -35,6 +37,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase by lazy {
         CalculatePossibleScoresUseCase(scoresRepository)
+    }
+
+    override val registerHighscoreUseCase: RegisterHighscoreUseCase by lazy {
+        RegisterHighscoreUseCase(scoresRepository, highscoreRepository)
     }
 
 }
