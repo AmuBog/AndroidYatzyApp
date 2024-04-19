@@ -4,8 +4,9 @@ import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class CalculatePossibleStrokeUseCase(private val scoresRepository: ScoresRepository) {
+class CalculatePossibleStrokeUseCase @Inject constructor(private val scoresRepository: ScoresRepository) {
 
     suspend operator fun invoke(player: String) = withContext(Dispatchers.IO) {
         checkPossibleToStroke(player)

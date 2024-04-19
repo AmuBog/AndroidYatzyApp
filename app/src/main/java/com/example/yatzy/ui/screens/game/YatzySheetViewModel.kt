@@ -1,13 +1,8 @@
 package com.example.yatzy.ui.screens.game
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yatzy.GameState
-import com.example.yatzy.YatzyApplication
 import com.example.yatzy.data.DicePool
 import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.domain.CalculatePossibleScoresUseCase
@@ -18,10 +13,12 @@ import com.example.yatzy.models.Dice
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import com.example.yatzy.ui.screens.menu.ViewState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class YatzySheetUiState(
     val viewState: ViewState = ViewState.Idle,
@@ -36,7 +33,8 @@ data class YatzySheetUiState(
     val winner: String = ""
 )
 
-class YatzySheetViewModel(
+@HiltViewModel
+class YatzySheetViewModel @Inject constructor(
     private val scoresRepository: ScoresRepository,
     private val calculatePossibleScoresUseCase: CalculatePossibleScoresUseCase,
     private val calculatePossibleStrokeUseCase: CalculatePossibleStrokeUseCase,
@@ -105,22 +103,6 @@ class YatzySheetViewModel(
                 dices = DicePool.resetDices(),
                 turn = GameState.turn
             )
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = this[APPLICATION_KEY] as YatzyApplication
-
-                YatzySheetViewModel(
-                    application.container.scoresRepository,
-                    application.container.calculatePossibleScoresUseCase,
-                    application.container.calculatePossibleStrokeUseCase,
-                    application.container.registerScoreUseCase,
-                    application.container.registerHighscoreUseCase,
-                )
-            }
         }
     }
 

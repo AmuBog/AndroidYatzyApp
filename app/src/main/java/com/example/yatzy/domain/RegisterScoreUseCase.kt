@@ -5,8 +5,9 @@ import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RegisterScoreUseCase(private val repository: ScoresRepository) {
+class RegisterScoreUseCase @Inject constructor(private val repository: ScoresRepository) {
 
     suspend operator fun invoke(score: Score) = withContext(Dispatchers.IO) {
         registerScore(score)

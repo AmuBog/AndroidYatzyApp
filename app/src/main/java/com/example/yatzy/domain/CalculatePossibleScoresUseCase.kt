@@ -7,8 +7,9 @@ import com.example.yatzy.models.Dice
 import com.example.yatzy.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class CalculatePossibleScoresUseCase(private val scoresRepository: ScoresRepository) {
+class CalculatePossibleScoresUseCase @Inject constructor(private val scoresRepository: ScoresRepository) {
 
     suspend operator fun invoke(player: String, dices: List<Dice>): Map<YatzyScoreType, Int> =
         withContext(Dispatchers.IO) { checkPossibleOutcomes(player, dices) }

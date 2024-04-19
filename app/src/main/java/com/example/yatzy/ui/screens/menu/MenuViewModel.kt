@@ -1,21 +1,19 @@
 package com.example.yatzy.ui.screens.menu
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.yatzy.GameState
 import com.example.yatzy.data.database.YatzyDatabase
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 sealed class ViewState {
     data object Idle : ViewState()
@@ -31,7 +29,8 @@ data class MenuUIState(
     val dailyQuote: String = ""
 )
 
-class MenuViewModel(val db: YatzyDatabase) : ViewModel() {
+@HiltViewModel
+class MenuViewModel @Inject constructor(val db: YatzyDatabase) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MenuUIState())
     val uiState = _uiState.asStateFlow()
@@ -128,12 +127,6 @@ class MenuViewModel(val db: YatzyDatabase) : ViewModel() {
     private fun addScoresToDb(scores: List<Score>) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) { db.scoreDao().addPlayerScores(scores) }
-        }
-    }
-
-    companion object {
-        fun factory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-            initializer { MenuViewModel(db = YatzyDatabase.getInstance(context)) }
         }
     }
 

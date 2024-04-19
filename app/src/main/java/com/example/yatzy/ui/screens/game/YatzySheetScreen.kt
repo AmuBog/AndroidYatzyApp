@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.yatzy.R
 import com.example.yatzy.ui.common.Dice
 import com.example.yatzy.ui.common.PrimaryButton
@@ -45,7 +45,7 @@ import com.example.yatzy.ui.theme.YatzyTheme
 @Composable
 fun YatzySheetScreen(
     backNavigation: () -> Unit,
-    viewModel: YatzySheetViewModel = viewModel(factory = YatzySheetViewModel.Factory)
+    viewModel: YatzySheetViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

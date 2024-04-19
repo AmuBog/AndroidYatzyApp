@@ -5,8 +5,9 @@ import com.example.yatzy.data.repository.ScoresRepository
 import com.example.yatzy.models.Highscore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RegisterHighscoreUseCase(
+class RegisterHighscoreUseCase @Inject constructor(
     private val scoresRepository: ScoresRepository,
     private val highscoreRepository: HighscoreRepository
 ) {
