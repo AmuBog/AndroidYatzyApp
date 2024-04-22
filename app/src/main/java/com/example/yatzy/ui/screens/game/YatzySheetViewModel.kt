@@ -112,4 +112,9 @@ class YatzySheetViewModel @Inject constructor(
         }
     }
 
+    fun quitGame() = viewModelScope.launch {
+        GameState.resetGame()
+        scoresRepository.clearScores()
+    }
+
 }
