@@ -54,7 +54,11 @@ fun YatzySheetScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.yatzy)) },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = backNavigation) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
@@ -95,7 +99,8 @@ fun YatzySheetScreen(
                                             score.copy(value = uiState.possibleOutcomes[score.type]!!)
                                         )
                                     },
-                                text = score.type.name
+                                text = score.type.name,
+                                color = Color.White
                             )
                         } else if (uiState.numberOfThrows == 0 && uiState.possibleStrokes[score.type] != null) {
                             Text(
