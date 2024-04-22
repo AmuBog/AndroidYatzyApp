@@ -1,15 +1,16 @@
 package com.example.yatzy.data
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.yatzy.models.Dice
+import com.example.yatzy.models.DiceModel
 
 object DicePool {
 
-    val dices = mutableStateListOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5))
+    val dices =
+        mutableStateListOf(DiceModel(1), DiceModel(2), DiceModel(3), DiceModel(4), DiceModel(5))
 
-    fun throwDices(): List<Dice> {
+    fun throwDices(): List<DiceModel> {
         val dices = dices
-        val dicesAfterThrow = mutableListOf<Dice>()
+        val dicesAfterThrow = mutableListOf<DiceModel>()
 
         for (i in dices.indices) {
             if (dices[i].isLocked) {
@@ -22,14 +23,14 @@ object DicePool {
         return dicesAfterThrow
     }
 
-    fun lockDice(index: Int): List<Dice> {
+    fun lockDice(index: Int): List<DiceModel> {
         dices[index] = dices[index].copy(isLocked = !dices[index].isLocked)
         return dices
     }
 
-    fun resetDices(): List<Dice> {
+    fun resetDices(): List<DiceModel> {
         dices.clear()
-        dices.addAll(listOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5)))
+        dices.addAll(listOf(DiceModel(1), DiceModel(2), DiceModel(3), DiceModel(4), DiceModel(5)))
         return dices
     }
 

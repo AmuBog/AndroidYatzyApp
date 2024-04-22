@@ -9,7 +9,7 @@ import com.example.yatzy.domain.CalculatePossibleScoresUseCase
 import com.example.yatzy.domain.CalculatePossibleStrokeUseCase
 import com.example.yatzy.domain.RegisterHighscoreUseCase
 import com.example.yatzy.domain.RegisterScoreUseCase
-import com.example.yatzy.models.Dice
+import com.example.yatzy.models.DiceModel
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import com.example.yatzy.ui.screens.menu.ViewState
@@ -27,7 +27,13 @@ data class YatzySheetUiState(
     val scores: Map<String, List<Score>> = mapOf(),
     val possibleOutcomes: Map<YatzyScoreType, Int> = mapOf(),
     val possibleStrokes: Map<YatzyScoreType, Int> = mapOf(),
-    val dices: List<Dice> = listOf(Dice(1), Dice(2), Dice(3), Dice(4), Dice(5)),
+    val dices: List<DiceModel> = listOf(
+        DiceModel(1),
+        DiceModel(2),
+        DiceModel(3),
+        DiceModel(4),
+        DiceModel(5)
+    ),
     val turn: Int = 1,
     val highscore: Int = 0,
     val winner: String = ""

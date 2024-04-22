@@ -19,9 +19,10 @@ class CalculatePossibleStrokeUseCase @Inject constructor(private val scoresRepos
             remove(YatzyScoreType.Bonus)
             remove(YatzyScoreType.UpperSum)
             remove(YatzyScoreType.Sum)
-            filter { !it.value.isStroke }
-        }.map { it.key to it.value.value }.toMap()
-        possibleToStroke = tempList.filter { it.value == 0 }
+        }
+
+        possibleToStroke = tempList.filter { !it.value.isStroke && it.value.value == 0 }
+            .map { it.key to it.value.value }.toMap()
 
         return possibleToStroke
     }

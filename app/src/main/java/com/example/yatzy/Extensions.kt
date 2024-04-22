@@ -1,6 +1,6 @@
 package com.example.yatzy
 
-import com.example.yatzy.models.Dice
+import com.example.yatzy.models.DiceModel
 import com.example.yatzy.models.YatzyScoreType
 import com.example.yatzy.models.YatzyScoreType.Chance
 import com.example.yatzy.models.YatzyScoreType.Fives
@@ -18,7 +18,7 @@ import com.example.yatzy.models.YatzyScoreType.TwoPairs
 import com.example.yatzy.models.YatzyScoreType.Twos
 import com.example.yatzy.models.YatzyScoreType.Yatzy
 
-fun List<Dice>.checkUpperSection() = mapOf(
+fun List<DiceModel>.checkUpperSection() = mapOf(
     Ones to this.filter { it.value == 1 }.sumOf { it.value },
     Twos to this.filter { it.value == 2 }.sumOf { it.value },
     Threes to this.filter { it.value == 3 }.sumOf { it.value },
@@ -27,7 +27,7 @@ fun List<Dice>.checkUpperSection() = mapOf(
     Sixes to this.filter { it.value == 6 }.sumOf { it.value }
 ).filter { it.value != 0 }
 
-fun List<Dice>.checkLowerSection() =
+fun List<DiceModel>.checkLowerSection() =
     mapOf(
         OnePair to getMostValuablePair(this),
         TwoPairs to getTwoPairs(this),
@@ -40,7 +40,7 @@ fun List<Dice>.checkLowerSection() =
         Yatzy to if (this.all { it.value == this[0].value }) 50 else 0,
     ).filter { it.value != 0 }
 
-private fun getMostValuablePair(dices: List<Dice>): Int {
+private fun getMostValuablePair(dices: List<DiceModel>): Int {
     val pairs = dices.groupingBy { it.value }
         .eachCount()
         .filter { it.value >= 2 }.map { it.key }
@@ -48,7 +48,7 @@ private fun getMostValuablePair(dices: List<Dice>): Int {
     return if (pairs.isNotEmpty()) pairs.first() * 2 else 0
 }
 
-private fun getTwoPairs(dices: List<Dice>): Int {
+private fun getTwoPairs(dices: List<DiceModel>): Int {
     val pairs = dices.groupingBy { it.value }
         .eachCount()
         .filter { it.value >= 2 }
@@ -62,13 +62,13 @@ private fun getTwoPairs(dices: List<Dice>): Int {
     return score
 }
 
-private fun getSomeOfAKind(numberOfKind: Int, dices: List<Dice>): Int {
+private fun getSomeOfAKind(numberOfKind: Int, dices: List<DiceModel>): Int {
     val someOfAKind =
         dices.groupingBy { it.value }.eachCount().filter { it.value >= numberOfKind }.keys
     return if (someOfAKind.isNotEmpty()) someOfAKind.first() * numberOfKind else 0
 }
 
-private fun getHouse(dices: List<Dice>): Int {
+private fun getHouse(dices: List<DiceModel>): Int {
     val count = dices.groupingBy { it.value }.eachCount()
 
     return if (count.size == 2 && count.values.any { it == 3 }) dices.sumOf { it.value } else 0
