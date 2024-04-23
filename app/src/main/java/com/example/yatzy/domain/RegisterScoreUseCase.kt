@@ -1,6 +1,8 @@
 package com.example.yatzy.domain
 
+import com.example.yatzy.GameState
 import com.example.yatzy.data.repository.ScoresRepository
+import com.example.yatzy.models.GameType
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +22,7 @@ class RegisterScoreUseCase @Inject constructor(private val repository: ScoresRep
     }
 
     private fun addSumAndBonus(score: Score) {
+        val bonusLimit = if (GameState.gameType == GameType.FREE) 63 else 42
         val playerScore = repository.getPlayerScores(score.playerName)
 
         var upperSum = playerScore.find { it.type == YatzyScoreType.UpperSum }?.value ?: 0
@@ -29,7 +32,7 @@ class RegisterScoreUseCase @Inject constructor(private val repository: ScoresRep
 
         val bonus: Int =
             if (playerScore.find { it.type == YatzyScoreType.Bonus }?.value == 50) 0
-            else if (upperSum >= 63) 50
+            else if (upperSum >= bonusLimit) 50
             else 0
 
         if (score.type.isUpperHalf()) {

@@ -62,7 +62,8 @@ fun MenuScreen(
             onStartGame = {
                 viewModel.startGame()
                 navigateToYatzyGame()
-            }
+            },
+            onUpdateGameType = { viewModel.updateGameType(it) }
         )
     }
 

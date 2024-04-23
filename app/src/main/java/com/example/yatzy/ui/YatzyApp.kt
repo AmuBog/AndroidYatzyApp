@@ -5,6 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yatzy.GameState
+import com.example.yatzy.models.GameType
+import com.example.yatzy.ui.screens.game.ForcedYatzyScreen
 import com.example.yatzy.ui.screens.game.YatzySheetScreen
 import com.example.yatzy.ui.screens.highscore.HighscoreScreen
 import com.example.yatzy.ui.screens.menu.MenuScreen
@@ -25,9 +28,19 @@ fun YatzyApp(navController: NavHostController = rememberNavController()) {
             )
         }
         composable(route = Destinations.YATZY_GAME) {
-            YatzySheetScreen(
-                backNavigation = { navController.navigateUp() }
-            )
+            when (GameState.gameType) {
+                GameType.FORCED -> {
+                    ForcedYatzyScreen(
+                        backNavigation = { navController.navigateUp() }
+                    )
+                }
+
+                GameType.FREE -> {
+                    YatzySheetScreen(
+                        backNavigation = { navController.navigateUp() }
+                    )
+                }
+            }
         }
         composable(route = Destinations.HIGHSCORE) {
             HighscoreScreen(

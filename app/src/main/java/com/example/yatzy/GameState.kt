@@ -1,7 +1,11 @@
 package com.example.yatzy
 
+import com.example.yatzy.models.GameType
+
 object GameState {
+
     private var playerTurnIndex = 0
+    var gameType = GameType.FREE
     var turn = 1
     val players = mutableListOf<String>()
     val playerTurn

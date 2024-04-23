@@ -14,6 +14,10 @@ class ScoresRepository @Inject constructor(private val scoreDao: ScoreDao) {
             .associateWith { player -> scores.filter { it.playerName == player } }
     }
 
+    fun getScoreBoardBasedOnType() = scoreDao.getPlayerScores().map { scores ->
+        scores.map { it.type }.associateWith { type -> scores.filter { it.type == type } }
+    }
+
     fun getPlayerScores(playerName: String) = scoreDao.getPlayerScores(playerName)
 
     fun getPlayerSums() = scoreDao.getPlayerSums()

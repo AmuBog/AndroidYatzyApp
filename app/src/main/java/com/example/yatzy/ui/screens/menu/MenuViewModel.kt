@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yatzy.GameState
 import com.example.yatzy.data.database.YatzyDatabase
+import com.example.yatzy.models.GameType
 import com.example.yatzy.models.Score
 import com.example.yatzy.models.YatzyScoreType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,6 +66,10 @@ class MenuViewModel @Inject constructor(val db: YatzyDatabase) : ViewModel() {
 
     fun checkOngoingGame() {
         _uiState.update { it.copy(hasOngoingGame = GameState.players.isNotEmpty()) }
+    }
+
+    fun updateGameType(gameType: GameType) {
+        GameState.gameType = gameType
     }
 
     fun addPlayer() {
